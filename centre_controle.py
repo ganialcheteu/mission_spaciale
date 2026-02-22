@@ -1,6 +1,7 @@
 import re
 from pathlib import Path
 import os
+import json
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -95,6 +96,53 @@ if not os.path.exists("mission_data/archives/"):
 print("\n Structure du dossier: \n📁 mission_data/")
 for mission_data_file in mission_data_files:
  mission_data_file = os.path.join("mission_data/", mission_data_file) # Recupere le relative path du fichier enfant
- print(f"| | {mission_data_file} ({os.path.getsize(mission_data_file)} ko)") 
+ print(f"| | {mission_data_file} ({os.path.getsize(mission_data_file)} ko)")   
+    
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#Task 3 : Chargement et affichage des listes de dicts
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
  
+with open("mission_data/missions.json", "r", encoding="utf-8") as f :
+     # transformer le contenu du fichier json en un objet python (liste,dict) avec load()
+      all_mission_datas =  json.load(f) 
+     # Affichage du resume de chaque mission
+      for all_mission_data in all_mission_datas['missions'] :
+        print(f"[{all_mission_data['id']}] {all_mission_data['nom']} → {all_mission_data['destination']} | {all_mission_data['duree_jours']} jours | Équipage : {len(all_mission_data['equipage'])} | {"{:,}".format(all_mission_data['budget_millions_usd']).replace(",", " ")} M$")
+        
+     # Budget total de toutes les missions
+      total_budget = sum(all_mission_data['budget_millions_usd'] for all_mission_data in all_mission_datas['missions'])
+      print(f"{total_budget} M$")
+      
+      
+     # methode 1
+      
+     # Mission la plus longue
+      """mission_plus_longue = max(all_mission_datas['missions'], key=lambda m: m['duree_jours'])
+      print(f"La mission la plus longue: {mission_plus_longue['nom']}")"""
+
+     # Mission la plus courte
+      """mission_plus_courte = min(all_mission_datas['missions'], key=lambda m: m['duree_jours'])
+      print(f"La mission la plus courte: {mission_plus_courte['nom']}")"""
+      
+     # methode 2
+      missions = all_mission_datas['missions']
+
+      mission_plus_longue = missions[0]
+      mission_plus_courte = missions[0]
+
+      for mission in missions:
+       if mission['duree_jours'] > mission_plus_longue['duree_jours']:
+        mission_plus_longue = mission
+    
+       if mission['duree_jours'] < mission_plus_courte['duree_jours']:
+        mission_plus_courte = mission
+      
+     # Mission la plus longue
+      
+      print("Mission la plus longue :", mission_plus_longue['nom'])
+      
+     # Mission la plus courte
+      
+      print("Mission la plus courte :", mission_plus_courte['nom']) 
+     
